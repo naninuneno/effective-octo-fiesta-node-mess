@@ -15,7 +15,6 @@ loginForm.addEventListener("submit", function (e) {
         }
     };
     var jsonData = JSON.stringify(data);
-    console.log("data: " + jsonData);
 
     $.ajax({
         url: "/api/users/login",
@@ -23,10 +22,13 @@ loginForm.addEventListener("submit", function (e) {
         data: jsonData,
         contentType: "application/json",
         success: function(result) {
-            console.log("Success: " + JSON.stringify(result));
+            const jsonResult = JSON.stringify(result);
+            console.log("Success: " + jsonResult);
+            window.location.replace("/");
         },
         error: function(xhr, status, error) {
             console.log("error: " + xhr.responseText);
+            $('#errors').text(JSON.parse(xhr.responseText).errors.join(', '));
         }
     });
 });

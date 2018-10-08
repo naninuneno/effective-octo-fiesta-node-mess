@@ -38,32 +38,34 @@ app.use(session({
     cookie: {
         // only the agent (e.g. browser) will have access for resubmission on requests
         httpOnly: true,
+        maxAge: 2 * 60 * 60 * 1000
     }
 }));
 
-// convenience method to associate user info with a user session
-session.Session.prototype.login = function(user, cb) {
-    const req = this.req;
-    req.session.regenerate(function(err){
-        if (err){
-            cb(err);
-        }
-    });
+setupSession();
 
-    req.session.userInfo = user;
-    cb();
-};
+function setupSession() {
+    // convenience method to associate user info with a user session
+    session.Session.prototype.login = function(user, cb) {
+        const req = this.req;
+        req.session.regenerate(function(err){
+            if (err){
+                cb(err);
+            }
+        });
 
+        req.session.userInfo = user;
+        cb();
+    };
 
-// important that this comes after session management
-// app.use(app.router);
+    session.Session.prototype.logout = function() {
+        this.req.session.userInfo = null;
+    };
 
-// app.use(session({
-//     secret: 'donotuseinproduction',
-//     cookie: { maxAge: 60000 },
-//     resave: false,
-//     saveUninitialized: false
-// }));
+    session.Session.prototype.isLoggedIn = function() {
+        return !(this.req.session.userInfo == null);
+    };
+}
 
 // models
 require('./db/models/users');

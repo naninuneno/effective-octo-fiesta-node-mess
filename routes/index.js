@@ -3,11 +3,19 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Espresso', descriptor: 'garbage' });
+    if (req.session.isLoggedIn()) {
+        res.render('index', {title: 'Espresso', descriptor: 'garbage'});
+    } else {
+        res.redirect('/login');
+    }
 });
 
 router.get('/login', function(req, res, next) {
-  res.render('login');
+    if (req.session.isLoggedIn()) {
+        res.redirect('/');
+    } else {
+        res.render('login');
+    }
 });
 
 router.use('/api', require('./api'));

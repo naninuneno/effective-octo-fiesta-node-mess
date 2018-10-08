@@ -1,15 +1,14 @@
 const mongoose = require('mongoose');
 const passport = require('passport');
 const router = require('express').Router();
-const auth = require('../auth');
 const Users = mongoose.model('Users');
 
-router.get('/', function(req, res, next) {
-    res.render('index', { title: 'Users', descriptor: 'still garbage' });
+router.get('/', function (req, res, next) {
+    res.render('index', {title: 'Users', descriptor: 'still garbage'});
 });
 
-//POST new user route (optional, everyone has access)
-router.post('/', auth.optional, (req, res, next) => {
+// POST new user route (optional, everyone has access)
+router.post('/', (req, res, next) => {
     const {body: {user}} = req;
 
     if (!user.email) {
@@ -33,28 +32,33 @@ router.post('/', auth.optional, (req, res, next) => {
     finalUser.setPassword(user.password);
 
     return finalUser.save();
-
-    // return finalUser.save()
-    //     .then(() => res.json({user: finalUser.toAuthJSON()}));
 });
 
-//POST login route (optional, everyone has access)
-router.post('/login', auth.optional, (req, res, next) => {
+// POST login route (optional, everyone has access)
+router.post('/login', (req, res, next) => {
     const {body: {user}} = req;
 
     if (!user.email) {
         return res.status(422).json({
-            errors: {
-                email: 'is required',
-            },
+            errors: [
+                'email is required',
+            ],
         });
     }
 
     if (!user.password) {
         return res.status(422).json({
-            errors: {
-                password: 'is required',
-            },
+            errors: [
+                'password is required',
+            ],
+        });
+    }
+
+    if (req.session.isLoggedIn()) {
+        return res.status(422).json({
+            errors: [
+                'already logged in'
+            ]
         });
     }
 
@@ -64,43 +68,34 @@ router.post('/login', auth.optional, (req, res, next) => {
         }
 
         if (passportUser) {
-            req.session.login(passportUser, function(err) {
+            req.session.login(passportUser, function (err) {
                 if (err) {
                     return res.status(500).json({
-                        errors: {
-                            general: "There was an error logging in. Please try again later."
-                        }
+                        errors: [
+                            'There was an error logging in. Please try again later.'
+                        ]
                     });
                 }
             });
 
-            return res.json({user: passportUser});
-
-            // const user = passportUser;
-            // user.token = passportUser.generateJWT();
-            // return res.json({user: user.toAuthJSON()});
+            return res.json({
+                user: passportUser,
+                session: req.session
+            });
         }
 
         return res.status(400).json({
-            errors: {
-                general: 'invalid credentials'
-            },
+            errors: [
+                'invalid credentials'
+            ],
         });
     })(req, res, next);
 });
 
-//GET current user (required, only authenticated users have access)
-router.get('/current', auth.required, (req, res, next) => {
-    // const {payload: {id}} = req;
-    //
-    // return Users.findById(id)
-    //     .then((user) => {
-    //         if (!user) {
-    //             return res.sendStatus(400);
-    //         }
-    //
-    //         return res.json({user: user.toAuthJSON()});
-    //     });
+// POST login route (optional, everyone has access)
+router.post('/logout', (req, res, next) => {
+    req.session.logout();
+    return res.json({});
 });
 
 module.exports = router;

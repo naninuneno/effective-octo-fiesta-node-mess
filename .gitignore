@@ -62,3 +62,4 @@ typings/
 
 # user-defined
 .idea/
+public/javascripts/build/
