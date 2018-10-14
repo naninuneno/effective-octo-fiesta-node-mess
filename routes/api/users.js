@@ -80,7 +80,8 @@ router.post('/login', (req, res, next) => {
 
             return res.json({
                 user: passportUser,
-                session: req.session
+                session: req.session,
+                session_id: req.sessionID
             });
         }
 

@@ -10,7 +10,7 @@ router.get('/', function (req, res, next) {
     });
 });
 
-// POST new product route
+// POST new product
 router.post('/', (req, res, next) => {
     var product = req.body;
 
@@ -50,6 +50,13 @@ router.post('/', (req, res, next) => {
         const newProduct = new Products(product);
         newProduct.save();
         return res.json(newProduct);
+    });
+});
+
+// GET single product
+router.get('/:id', function (req, res, next) {
+    Products.findById(req.params.id).lean().exec(function (err, product) {
+        return res.json(product);
     });
 });
 

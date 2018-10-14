@@ -24,7 +24,8 @@
     "node-sass-middleware": "0.11.0",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
-    "lodash": "latest"
+    "lodash": "latest",
+    "request": "latest"
   },
   "devDependencies": {
     "del": "^3.0.0",

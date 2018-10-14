@@ -30,3 +30,7 @@ a {
   background-color: darkgrey;
   margin-bottom: 10px;
 }
+
+.item-container > p > a {
+  color: black;
+}

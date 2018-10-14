@@ -5,7 +5,7 @@
     <h3>{{@key}}</h3>
     {{#each this}}
         <div class="item-container">
-            <p>Name: {{name}}</p>
+            <p>Name: <a href="/products/{{_id}}">{{name}}</a></p>
             <p>Price: {{price}}</p>
             <p>Category: {{category.type}}</p>
         </div>

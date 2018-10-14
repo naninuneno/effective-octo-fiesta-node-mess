@@ -17,6 +17,18 @@ hbs.registerPartials(__dirname + '/views/partials');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
+/*
+    Custom helper for `if` equality check in handlebars template
+    Example usage:
+    {{#if (eq <val1> <val2>)}}<body>{{/if}}
+ */
+hbs.registerHelper('eq', function () {
+    const args = Array.prototype.slice.call(arguments, 0, -1);
+    return args.every(function (expression) {
+        return args[0] === expression;
+    });
+});
+
 // other app config
 app.use(cors());
 app.use(logger('dev'));
