@@ -10,3 +10,23 @@ a {
 #logout {
   float: right;
 }
+
+#user-indicator {
+  padding-top: 2px;
+}
+
+.category-container {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: lightgray;
+  margin-bottom: 20px;
+}
+
+.item-container {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: darkgrey;
+  margin-bottom: 10px;
+}

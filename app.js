@@ -7,7 +7,6 @@ const session = require('express-session');
 const hbs = require('hbs');
 const cors = require('cors');
 const MongoStore = require('connect-mongo')(session);
-const mongo = require('mongoose');
 
 const db = require('./db/db');
 
@@ -38,7 +37,7 @@ app.use(session({
     cookie: {
         // only the agent (e.g. browser) will have access for resubmission on requests
         httpOnly: true,
-        maxAge: 2 * 60 * 60 * 1000
+        maxAge: 7 * 24 * 60 * 60 * 1000
     }
 }));
 
@@ -65,10 +64,16 @@ function setupSession() {
     session.Session.prototype.isLoggedIn = function() {
         return !(this.req.session.userInfo == null);
     };
+
+    session.Session.prototype.currentUser = function() {
+        return this.req.session.userInfo.email;
+    };
 }
 
 // models
 require('./db/models/users');
+require('./db/models/categories');
+require('./db/models/products');
 // to perform after all models
 require('./config/passportConfig');
 
