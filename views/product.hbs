@@ -2,6 +2,11 @@
 
 {{> title subtitle="Product"}}
 
+<div class="options-container">
+    <p><a href="/products/{{product._id}}/edit">Edit</a></p>
+    <p><a href="/products/{{product._id}}/delete">Delete</a></p>
+</div>
+
 <div class="item-container">
     <p>Name: {{product.name}}</p>
     <p>Price: {{product.price}}</p>

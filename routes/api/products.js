@@ -12,39 +12,9 @@ router.get('/', function (req, res, next) {
 
 // POST new product
 router.post('/', (req, res, next) => {
-    var product = req.body;
-
-    if (!product.name) {
-        return res.status(422).json({
-            errors: {
-                name: 'is required',
-            },
-        });
-    }
-
-    if (!product.price) {
-        return res.status(422).json({
-            errors: {
-                price: 'is required',
-            },
-        });
-    }
-
-    if (!product.category) {
-        return res.status(422).json({
-            errors: {
-                category: 'is required',
-            },
-        });
-    }
-
-    return isValidCategory(product.category).then(function(isValid) {
-        if (!isValid) {
-            return res.status(422).json({
-                errors: {
-                    category: 'is invalid',
-                },
-            });
+    getProductFromRequest(req).then(function (product) {
+        if (product.errors) {
+            return res.status(422).json(product);
         }
 
         const newProduct = new Products(product);
@@ -59,6 +29,82 @@ router.get('/:id', function (req, res, next) {
         return res.json(product);
     });
 });
+
+// DELETE single product
+router.delete('/:id', function (req, res, next) {
+    Products.findByIdAndRemove(req.params.id, function (err, product) {
+        if (err) {
+            return res.json(err);
+        } else {
+            return res.json(product);
+        }
+    });
+});
+
+// EDIT single product
+router.put('/:id', function (req, res, next) {
+    getProductFromRequest(req).then(function (update) {
+        if (update.errors) {
+            return res.status(422).json(update);
+        }
+
+        Products.findOneAndUpdate(
+            {"_id": req.params.id},
+            {
+                $set: {
+                    "name": update.name,
+                    "price": update.price,
+                    "category": update.category
+                }
+            },
+            {new: true}
+        ).then(function (product) {
+            return res.json(product);
+        });
+    });
+});
+
+function getProductFromRequest(req) {
+    return new Promise(function (resolve, reject) {
+        const product = req.body;
+
+        if (!product.name) {
+            resolve({
+                errors: {
+                    name: 'is required',
+                },
+            });
+        }
+
+        if (!product.price) {
+            resolve({
+                errors: {
+                    price: 'is required',
+                },
+            });
+        }
+
+        if (!product.category) {
+            resolve({
+                errors: {
+                    category: 'is required',
+                },
+            });
+        }
+
+        return isValidCategory(product.category).then(function (isValid) {
+            if (!isValid) {
+                resolve({
+                    errors: {
+                        category: 'is invalid',
+                    },
+                });
+            }
+
+            resolve(product);
+        });
+    });
+}
 
 // GET all categories
 router.get('/categories/', (req, res, next) => {
@@ -85,12 +131,12 @@ router.post('/categories/', (req, res, next) => {
 });
 
 function isValidCategory(category) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         if (!category.type) {
             resolve(false);
         }
 
-        Categories.countDocuments( { type: category.type } ).exec((err, count) => {
+        Categories.countDocuments({type: category.type}).exec((err, count) => {
             if (err) {
                 resolve(false);
             }
