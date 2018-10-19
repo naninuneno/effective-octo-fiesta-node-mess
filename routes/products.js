@@ -5,6 +5,7 @@ const request = require('request');
 
 const mongoose = require('mongoose');
 const Products = mongoose.model('Products');
+const Categories = mongoose.model('Categories');
 
 const helper = require('./route_helper');
 
@@ -66,6 +67,56 @@ router.get('/:id/delete', function (req, res, next) {
                 }
             }
         );
+    });
+});
+
+router.get('/:id/edit', function (req, res, next) {
+    helper.redirectToLoginOrShow(req, res, function () {
+        return new Promise(function (resolve, reject) {
+            request.get(
+                helper.getBaseUrl(req) + '/api/products/' + req.params.id,
+                function (error, response, body) {
+                    if (!error) {
+                        resolve(JSON.parse(body));
+                    } else {
+                        reject(res.json(error));
+                    }
+                }
+            )
+        }).then(function (product) {
+            Categories.find().lean().exec(function (err, categories) {
+                return res.render('product', {
+                    edit: true,
+                    product: product,
+                    categories: categories,
+                    user: req.session.currentUser(),
+                    active_tab: "products"
+                });
+            });
+        });
+    });
+});
+
+router.post('/:id/submit_edit', function (req, res, next) {
+    helper.redirectToLoginOrShow(req, res, function () {
+        return new Promise(function (resolve, reject) {
+            request.put(
+                {
+                    uri: helper.getBaseUrl(req) + '/api/products/' + req.params.id,
+                    json: req.body,
+                },
+                function (error, response, body) {
+                    if (!error && response.statusCode === 200) {
+                        return resolve(body);
+                    } else {
+                        console.log('error: ' + error);
+                        return (res.json(error));
+                    }
+                }
+            )
+        }).then(function (product) {
+            res.send({redirect: '/products/' + product._id});
+        });
     });
 });
 

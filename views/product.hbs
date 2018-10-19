@@ -2,13 +2,33 @@
 
 {{> title subtitle="Product"}}
 
-<div class="options-container">
-    <p><a href="/products/{{product._id}}/edit">Edit</a></p>
-    <p><a href="/products/{{product._id}}/delete">Delete</a></p>
-</div>
+{{#if edit}}
+    <div class="item-container">
+        <form id="edit-product-form">
+            <input name="name" type="text" value="{{product.name}}" />
+            <input name="price" type="text" value="{{product.price}}" />
+            <select name="category">
+                {{#each categories}}
+                    <option>{{type}}</option>
+                {{/each}}
+            </select>
+            <input type="submit" value="Submit"/>
+        </form>
+        <p id="errors"></p>
+    </div>
 
-<div class="item-container">
-    <p>Name: {{product.name}}</p>
-    <p>Price: {{product.price}}</p>
-    <p>Category: {{product.category.type}}</p>
-</div>
+    <script>var productId = '{{product._id}}';</script>
+    <script src="/javascripts/build/edit_product.js"></script>
+{{else}}
+
+    <div class="options-container">
+        <p><a href="/products/{{product._id}}/edit">Edit</a></p>
+        <p><a href="/products/{{product._id}}/delete">Delete</a></p>
+    </div>
+
+    <div class="item-container">
+        <p>Name: {{product.name}}</p>
+        <p>Price: {{product.price}}</p>
+        <p>Category: {{product.category.type}}</p>
+    </div>
+{{/if}}

@@ -43,25 +43,36 @@ router.delete('/:id', function (req, res, next) {
 
 // EDIT single product
 router.put('/:id', function (req, res, next) {
-    getProductFromRequest(req).then(function (update) {
-        if (update.errors) {
-            return res.status(422).json(update);
-        }
-
-        Products.findOneAndUpdate(
-            {"_id": req.params.id},
-            {
-                $set: {
-                    "name": update.name,
-                    "price": update.price,
-                    "category": update.category
+    return getProductFromRequest(req)
+        .then(function (update) {
+            return new Promise(function (resolve, reject) {
+                if (update.errors || (!update.name)) {
+                    return reject(update);
                 }
-            },
-            {new: true}
-        ).then(function (product) {
-            return res.json(product);
+
+                Products.findOneAndUpdate(
+                    {"_id": req.params.id},
+                    {
+                        $set: {
+                            "name": update.name,
+                            "price": update.price,
+                            "category": update.category
+                        }
+                    },
+                    {new: true}
+                ).then(function (product) {
+                    console.log('returning product');
+                    return resolve(product);
+                });
+            })
+        })
+        .then(function (update) {
+            console.log('this should be like 3rd');
+            return res.json(update);
+        })
+        .catch(function (err) {
+            return res.status(422).json(err);
         });
-    });
 });
 
 function getProductFromRequest(req) {
@@ -69,7 +80,7 @@ function getProductFromRequest(req) {
         const product = req.body;
 
         if (!product.name) {
-            resolve({
+            return resolve({
                 errors: {
                     name: 'is required',
                 },
@@ -77,7 +88,7 @@ function getProductFromRequest(req) {
         }
 
         if (!product.price) {
-            resolve({
+            return resolve({
                 errors: {
                     price: 'is required',
                 },
@@ -85,7 +96,7 @@ function getProductFromRequest(req) {
         }
 
         if (!product.category) {
-            resolve({
+            return resolve({
                 errors: {
                     category: 'is required',
                 },
@@ -94,14 +105,14 @@ function getProductFromRequest(req) {
 
         return isValidCategory(product.category).then(function (isValid) {
             if (!isValid) {
-                resolve({
+                return resolve({
                     errors: {
                         category: 'is invalid',
                     },
                 });
             }
 
-            resolve(product);
+            return resolve(product);
         });
     });
 }
@@ -132,7 +143,7 @@ router.post('/categories/', (req, res, next) => {
 
 function isValidCategory(category) {
     return new Promise(function (resolve, reject) {
-        if (!category.type) {
+        if (!category || !category.type) {
             resolve(false);
         }
 
@@ -143,6 +154,8 @@ function isValidCategory(category) {
 
             resolve(count > 0);
         });
+    }).catch(function (rej) {
+        console.log(rej);
     });
 }
 

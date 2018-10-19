@@ -1,8 +1,12 @@
 var gulp = require('gulp'),
     del = require('del'),
+    gulpif = require('gulp-if'),
     uglify = require('gulp-uglify-es').default,
     notify = require('gulp-notify'),
-    nodemon = require('gulp-nodemon');
+    nodemon = require('gulp-nodemon'),
+    argv = require('yargs').argv;
+
+var productionMode = (argv.production !== undefined);
 
 gulp.task('default', function () {
     // place code for your default task here
@@ -15,7 +19,7 @@ gulp.task('clean', function () {
 gulp.task('scripts', function () {
     return gulp.src('public/javascripts/dev/**/*.js')
         // Minify the file
-        .pipe(uglify())
+        .pipe(gulpif(productionMode, uglify()))
         // Output
         .pipe(gulp.dest('public/javascripts/build'))
         .pipe(notify({message: 'Scripts task complete'}));
@@ -34,10 +38,4 @@ gulp.task('host', ['scripts'], function (cb) {
         .on('crash', function() {
             console.error('Application has crashed!')
         })
-
-    // exec('npm run start_old', function (err, stdout, stderr) {
-    //     console.log(stdout);
-    //     console.log(stderr);
-    //     cb(err);
-    // });
 });
