@@ -9,6 +9,7 @@ const Categories = mongoose.model('Categories');
 
 const helper = require('./route_helper');
 
+// All Products View
 router.get('/', function (req, res, next) {
     helper.redirectToLoginOrShow(req, res, function () {
         getGroupedCategories().then(function (productMap) {
@@ -33,6 +34,45 @@ router.get('/', function (req, res, next) {
     });
 });
 
+// Create Product View
+router.get('/create', function (req, res, next) {
+    helper.redirectToLoginOrShow(req, res, function () {
+        Categories.find().lean().exec(function (err, categories) {
+            return res.render('product', {
+                create: true,
+                categories: categories,
+                user: req.session.currentUser(),
+                active_tab: "products"
+            });
+        });
+    });
+});
+
+// Create Product
+router.post('/create', function (req, res, next) {
+    helper.redirectToLoginOrShow(req, res, function () {
+        return new Promise(function (resolve, reject) {
+            request.post(
+                {
+                    uri: helper.getBaseUrl(req) + '/api/products/',
+                    json: req.body,
+                },
+                function (error, response, body) {
+                    if (!error && response.statusCode === 200) {
+                        return resolve(body);
+                    } else {
+                        console.log('error: ' + body);
+                        return res.status(422).json(body);
+                    }
+                }
+            )
+        }).then(function () {
+            res.send({redirect: '/products/'});
+        });
+    });
+});
+
+// View Product
 router.get('/:id/', function (req, res, next) {
     helper.redirectToLoginOrShow(req, res, function () {
         return request.get(
@@ -54,6 +94,7 @@ router.get('/:id/', function (req, res, next) {
     });
 });
 
+// Delete Product
 router.get('/:id/delete', function (req, res, next) {
     helper.redirectToLoginOrShow(req, res, function () {
         return request.delete(
@@ -70,6 +111,7 @@ router.get('/:id/delete', function (req, res, next) {
     });
 });
 
+// Edit Product View
 router.get('/:id/edit', function (req, res, next) {
     helper.redirectToLoginOrShow(req, res, function () {
         return new Promise(function (resolve, reject) {
@@ -97,6 +139,7 @@ router.get('/:id/edit', function (req, res, next) {
     });
 });
 
+// Edit Product
 router.post('/:id/submit_edit', function (req, res, next) {
     helper.redirectToLoginOrShow(req, res, function () {
         return new Promise(function (resolve, reject) {

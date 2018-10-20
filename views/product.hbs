@@ -5,8 +5,11 @@
 {{#if edit}}
     <div class="item-container">
         <form id="edit-product-form">
+            <label>Name</label>
             <input name="name" type="text" value="{{product.name}}" />
+            <label>Price</label>
             <input name="price" type="text" value="{{product.price}}" />
+            <label>Type</label>
             <select name="category">
                 {{#each categories}}
                     <option>{{type}}</option>
@@ -19,6 +22,28 @@
 
     <script>var productId = '{{product._id}}';</script>
     <script src="/javascripts/build/edit_product.js"></script>
+
+{{else if create}}
+
+    <div class="item-container">
+        <form id="create-product-form">
+            <label>Name</label>
+            <input name="name" type="text" />
+            <label>Price</label>
+            <input name="price" type="text" />
+            <label>Type</label>
+            <select name="category">
+                {{#each categories}}
+                    <option>{{type}}</option>
+                {{/each}}
+            </select>
+            <input type="submit" value="Submit"/>
+        </form>
+        <p id="errors"></p>
+    </div>
+
+    <script src="/javascripts/build/create_product.js"></script>
+
 {{else}}
 
     <div class="options-container">

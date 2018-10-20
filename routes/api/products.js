@@ -81,34 +81,34 @@ function getProductFromRequest(req) {
 
         if (!product.name) {
             return resolve({
-                errors: {
-                    name: 'is required',
-                },
+                errors: [
+                    'name is required'
+                ],
             });
         }
 
         if (!product.price) {
             return resolve({
-                errors: {
-                    price: 'is required',
-                },
+                errors: [
+                    'price is required'
+                ],
             });
         }
 
         if (!product.category) {
             return resolve({
-                errors: {
-                    category: 'is required',
-                },
+                errors: [
+                    'type is required'
+                ],
             });
         }
 
         return isValidCategory(product.category).then(function (isValid) {
             if (!isValid) {
                 return resolve({
-                    errors: {
-                        category: 'is invalid',
-                    },
+                    errors: [
+                        'type is invalid'
+                    ],
                 });
             }
 
@@ -130,9 +130,9 @@ router.post('/categories/', (req, res, next) => {
 
     if (!category.type) {
         return res.status(422).json({
-            errors: {
-                type: 'is required',
-            },
+            errors: [
+                'type is required'
+            ],
         });
     }
 
