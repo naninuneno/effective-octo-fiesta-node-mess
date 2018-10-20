@@ -3,17 +3,16 @@ const mongoose = require('mongoose');
 //Configure mongoose's promise to global promise
 mongoose.promise = global.Promise;
 
-const dbUrl = 'mongodb://localhost/firstrestapidb';
+const dbname = process.env.NODE_ENV === 'test' ? 'testfirstrestapidb' : 'firstrestapidb';
+console.log('DB name: ' + dbname);
+
+const dbUrl = 'mongodb://localhost/' + dbname;
 
 const config = {
     db: {
-        db: 'firstrestapidb',
+        db: dbname,
         host: '127.0.0.1',
         url: dbUrl
-        // port: 6646,  // optional, default: 27017
-        // username: 'admin', // optional
-        // password: 'secret', // optional
-        // collection: 'mySessions' // optional, default: sessions
     },
     secret: 'donotuseinproduction'
 };
