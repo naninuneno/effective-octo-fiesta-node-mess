@@ -1,0 +1,1 @@
+global.SESSION_ID = 'should-be-initialised';
